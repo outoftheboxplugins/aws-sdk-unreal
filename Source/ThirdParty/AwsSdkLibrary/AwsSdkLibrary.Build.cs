@@ -1,47 +1,54 @@
 // Copyright Out-of-the-Box Plugins 2018-2024. All Rights Reserved.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Diagnostics;
-using System.Collections.Generic;
 using UnrealBuildTool;
 
 public class AwsSdkLibrary : ModuleRules
 {
 	// string[] AwsLibraries = {"core", "s3", "dynamodb"};
-	string[] AwsLibraries = {"core", "ec2" };
+	private readonly string[] AwsLibraries = { "core", "ec2" };
 
 	public AwsSdkLibrary(ReadOnlyTargetRules Target) : base(Target)
 	{
 		Type = ModuleType.External;
 
-		// This is a blocking operation which halts generation until libraries are build and copied over
-		BuildAwsLibraries();
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			BuildAwsLibraries("x64-windows-unreal", "powershell.exe");
+			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "lib"), "*.lib");
+			AddPrecompiledDlls(Path.Combine(ModuleDirectory, "x64-windows-unreal", "bin"), "*.dll");
+		}
+		else
+		{
+			BuildAwsLibraries("arm64-osx-unreal", "pwsh");
+			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "arm64-osx-unreal", "lib"), "*.a");
 
-		// Gives access to the AWS C++ SDK header files to modules referencing this
-		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "include"));
+			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "arm64-osx-unreal", "include"));
+
+			PublicFrameworks.AddRange(new[]
+			{
+				"Foundation",
+				"SystemConfiguration"
+			});
+		}
 
 		// We will be using Unreal Engine allocators, so we need this define to make sure we are using the correct types
 		PublicDefinitions.Add("USE_AWS_MEMORY_MANAGEMENT");
-
-		if (Target.Platform == UnrealTargetPlatform.Win64)
-		{
-			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "lib"), "*.lib");
-			AddPrecompiledDlls(Path.Combine(ModuleDirectory, "bin"), "*.dll");
-		}
 	}
 
-	private void BuildAwsLibraries()
+	private void BuildAwsLibraries(string VcpkgTriplet, string Executable)
 	{
-		string AwsLibrariesArg = AwsLibraries.Aggregate((current, next) => $"{current},{next}");
+		var AwsLibrariesArg = AwsLibraries.Aggregate((current, next) => $"{current},{next}");
 
-		string ScriptPath = Path.Combine(PluginDirectory, "Extras/Scripts/build-vcpkg.ps1");
+		var ScriptPath = Path.Combine(PluginDirectory, "Extras/Scripts/build-vcpkg.ps1");
 
 		// Prepare a new external process instance to build and copy binaries
-		Process Process = new Process();
-		Process.StartInfo.FileName = "powershell.exe";
-		Process.StartInfo.Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{ScriptPath}\" -awsLibraries {AwsLibrariesArg}";
+		var Process = new Process();
+		Process.StartInfo.FileName = Executable;
+		Process.StartInfo.Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{ScriptPath}\" -vcpkgTriplet {VcpkgTriplet} -awsLibraries {AwsLibrariesArg}";
 		Process.StartInfo.UseShellExecute = false;
 
 		Console.WriteLine(Name + " running script: " + ScriptPath);
@@ -53,8 +60,8 @@ public class AwsSdkLibrary : ModuleRules
 
 	private void AddPrecompiledLibraries(string FolderPath, string Extension)
 	{
-		List<string> Files = Directory.GetFiles(FolderPath, Extension, SearchOption.AllDirectories).ToList();
-		foreach (string File in Files)
+		var Files = Directory.GetFiles(FolderPath, Extension, SearchOption.AllDirectories).ToList();
+		foreach (var File in Files)
 		{
 			PublicAdditionalLibraries.Add(File);
 			Console.WriteLine(Name + " adding library: " + File);
@@ -63,10 +70,10 @@ public class AwsSdkLibrary : ModuleRules
 
 	private void AddPrecompiledDlls(string FolderPath, string Extension)
 	{
-		List<string> Files = Directory.GetFiles(FolderPath, Extension, SearchOption.AllDirectories).ToList();
-		foreach (string File in Files)
+		var Files = Directory.GetFiles(FolderPath, Extension, SearchOption.AllDirectories).ToList();
+		foreach (var File in Files)
 		{
-			string FileName = Path.GetFileName(File);
+			var FileName = Path.GetFileName(File);
 			RuntimeDependencies.Add(Path.Combine("$(BinaryOutputDir)", FileName), File);
 			PublicDelayLoadDLLs.Add(File);
 			Console.WriteLine(Name + " adding dll: " + File);

@@ -1,44 +1,59 @@
 Param(
+    [String] $vcpkgTriplet,
     [String] $awsLibraries
 )
 
 # Get the directory containing the .uplugin file
 $parentDir = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 
-# Spawn the vpckg directly inside the temp folder to have a shorter path
-$vpckgDir = "$env:TEMP/unreal-vcpkg"
+# Spawn the vcpkg directly inside the temp folder to have a shorter path
+$vcpkgDir = "$env:TEMP/unreal-vcpkg"
 
 # Print desired libraries for visibility
-Write-Host "Installing aws-sdk libraries: $awsLibraries in:$vpckgDir to:$parentDir"
+Write-Host "Installing aws-sdk libraries: $awsLibraries in:$vcpkgDir to:$parentDir"
 
-if (Test-Path -Path "$vpckgDir") {
+if (Test-Path -Path "$vcpkgDir") {
     Write-Host "VCPKG already present, pulling."
-    Push-Location "$vpckgDir"
+    Push-Location "$vcpkgDir"
     git pull 
     Pop-Location
 }
 else {
     Write-Host "VCPKG missing, cloning."
-    git clone https://github.com/Microsoft/vcpkg.git "$vpckgDir"
+    git clone https://github.com/Microsoft/vcpkg.git "$vcpkgDir"
 }
 
-# Clone the microsoft VCPKG repo
+$vcpkgExecutable = ""
+$vcpkgBootstrap = ""
+
+if ($IsLinux) {
+    $vcpkgBootstrap = "$vcpkgDir/bootstrap-vcpkg.sh"
+    $vcpkgExecutable = "$vcpkgDir/vcpkg"
+}
+elseif ($IsMacOS) {
+    $vcpkgBootstrap = "$vcpkgDir/bootstrap-vcpkg.sh"
+    $vcpkgExecutable = "$vcpkgDir/vcpkg"
+}
+elseif ($IsWindows) {
+    $vcpkgBootstrap = "$vcpkgDir/bootstrap-vcpkg.bat"
+    $vcpkgExecutable = "$vcpkgDir/vcpkg.exe"
+}
 
 # Bootstrap the new copy
-& "$vpckgDir/bootstrap-vcpkg.bat"
+& "$vcpkgBootstrap"
 
 # Uninstall the library to ensure only the required packages are built
-& "$vpckgDir/vcpkg.exe" remove "aws-sdk-cpp" --triplet x64-windows-unreal --overlay-triplets "$parentDir"
+& "$vcpkgExecutable" remove "aws-sdk-cpp" --triplet $vcpkgTriplet --overlay-triplets "$parentDir/Extras/Triplets"
 
 # Install AWS binaries
-& "$vpckgDir/vcpkg.exe" install "aws-sdk-cpp[$awsLibraries]" --recurse --triplet x64-windows-unreal --overlay-triplets "$parentDir/Extras/Triplets"
+& "$vcpkgExecutable" install "aws-sdk-cpp[$awsLibraries]" --recurse --triplet $vcpkgTriplet --overlay-triplets "$parentDir/Extras/Triplets"
 
 # Remove past includes
-Remove-Item -Path "$parentDir/Source/ThirdParty/AWSSDKLibrary/bin" -Recurse -Force
-Remove-Item -Path "$parentDir/Source/ThirdParty/AWSSDKLibrary/lib" -Recurse -Force
-Remove-Item -Path "$parentDir/Source/ThirdParty/AWSSDKLibrary/include" -Recurse -Force
+Remove-Item -Path "$parentDir/Source/ThirdParty/AwsSdkLibrary/$vcpkgTriplet/bin" -Recurse -Force
+Remove-Item -Path "$parentDir/Source/ThirdParty/AwsSdkLibrary/$vcpkgTriplet/lib" -Recurse -Force
+Remove-Item -Path "$parentDir/Source/ThirdParty/AwsSdkLibrary/$vcpkgTriplet/include" -Recurse -Force
 
 # Copy the binaries and header files to the plugin 
-Copy-Item -Path "$vpckgDir/installed/x64-windows-unreal/bin"        -Destination "$parentDir/Source/ThirdParty/AWSSDKLibrary/bin"       -Recurse -Force
-Copy-Item -Path "$vpckgDir/installed/x64-windows-unreal/lib"        -Destination "$parentDir/Source/ThirdParty/AWSSDKLibrary/lib"       -Recurse -Force
-Copy-Item -Path "$vpckgDir/installed/x64-windows-unreal/include"    -Destination "$parentDir/Source/ThirdParty/AWSSDKLibrary/include"   -Recurse -Force
+Copy-Item -Path "$vcpkgDir/installed/$vcpkgTriplet/bin"        -Destination "$parentDir/Source/ThirdParty/AwsSdkLibrary/$vcpkgTriplet/bin"       -Recurse -Force
+Copy-Item -Path "$vcpkgDir/installed/$vcpkgTriplet/lib"        -Destination "$parentDir/Source/ThirdParty/AwsSdkLibrary/$vcpkgTriplet/lib"       -Recurse -Force
+Copy-Item -Path "$vcpkgDir/installed/$vcpkgTriplet/include"    -Destination "$parentDir/Source/ThirdParty/AwsSdkLibrary/$vcpkgTriplet/include"   -Recurse -Force
