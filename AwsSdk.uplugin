@@ -1,0 +1,22 @@
+﻿{
+	"FileVersion": 3,
+	"VersionName": "1.0",
+	"EngineVersion": "5.3",
+	"FriendlyName": "AwsSdk",
+	"Description": "",
+	"Category": "Third Party",
+	"CreatedBy": "Out-of-the-Box Plugins",
+	"CreatedByURL": "https://outofthebox-plugins.com",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault": false,
+	"CanContainContent": false,
+	"Modules": [
+		{
+			"Name": "AwsSdkIntegration",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

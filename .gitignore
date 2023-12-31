@@ -1,0 +1,5 @@
+Binaries/
+Intermediate/
+
+Source/ThirdParty/AwsSdkLibrary/**
+!Source/ThirdParty/AwsSdkLibrary/*.Build.cs
