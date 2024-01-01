@@ -1,4 +1,4 @@
-﻿// Copyright Out-of-the-Box Plugins 2018-2024. All Rights Reserved.
+// Copyright Out-of-the-Box Plugins 2018-2024. All Rights Reserved.
 
 #include "AwsIntegrationSubsystem.h"
 
@@ -13,7 +13,7 @@ void UAwsIntegrationSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	AwsMemoryManager = std::make_shared<FUnrealMemoryManager>();
 
 	Options.memoryManagementOptions.memoryManager = AwsMemoryManager.get();
-	Options.loggingOptions.logLevel = Aws::Utils::Logging::LogLevel::Trace;
+	Options.loggingOptions.logLevel = AwsLogger->GetLogLevel();
 	Options.loggingOptions.logger_create_fn = [this]()
 	{
 		return AwsLogger;
