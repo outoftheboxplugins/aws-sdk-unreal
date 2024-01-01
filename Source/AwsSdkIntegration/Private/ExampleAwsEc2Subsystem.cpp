@@ -3,6 +3,7 @@
 #include "ExampleAwsEc2Subsystem.h"
 
 #include "AwsIntegrationSubsystem.h"
+#include "AwsLog.h"
 
 THIRD_PARTY_INCLUDES_START
 #include "aws/ec2/EC2Client.h"
@@ -34,7 +35,7 @@ void UExampleAwsEc2Subsystem::PrintEc2Instances()
 					InstanceInfo.Appendf(TEXT("%s:%s, "), *TagKey, *TagValue);
 				}
 
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *InstanceInfo);
+				UE_LOG(LogAwsSdk, Warning, TEXT("%s"), *InstanceInfo);
 			}
 		}
 	}
