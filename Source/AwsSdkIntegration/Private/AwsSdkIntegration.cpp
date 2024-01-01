@@ -2,4 +2,4 @@
 
 #include "AwsSdkIntegration.h"
 
-IMPLEMENT_MODULE(FAwsIntegrationModule, AWSSDK)
+IMPLEMENT_MODULE(FAwsIntegrationModule, AwsSdkIntegration)

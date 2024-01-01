@@ -21,7 +21,7 @@ public class AwsSdkLibrary : ModuleRules
 			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "lib"), "*.lib");
 			AddPrecompiledDlls(Path.Combine(ModuleDirectory, "x64-windows-unreal", "bin"), "*.dll");
 		}
-		else
+		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
 			BuildAwsLibraries("arm64-osx-unreal", "pwsh");
 			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "arm64-osx-unreal", "lib"), "*.a");
@@ -34,6 +34,14 @@ public class AwsSdkLibrary : ModuleRules
 				"SystemConfiguration"
 			});
 		}
+		else if (Target.Platform == UnrealTargetPlatform.IOS)
+		{
+			BuildAwsLibraries("arm64-ios-unreal", "pwsh");
+			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "arm64-ios-unreal", "lib"), "*.a");
+
+			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "arm64-ios-unreal", "include"));
+		}
+
 
 		// We will be using Unreal Engine allocators, so we need this define to make sure we are using the correct types
 		PublicDefinitions.Add("USE_AWS_MEMORY_MANAGEMENT");
