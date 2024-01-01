@@ -18,8 +18,10 @@ public class AwsSdkLibrary : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 			BuildAwsLibraries("x64-windows-unreal", "powershell.exe");
-			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "lib"), "*.lib");
+			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "x64-windows-unreal", "lib"), "*.lib");
 			AddPrecompiledDlls(Path.Combine(ModuleDirectory, "x64-windows-unreal", "bin"), "*.dll");
+			
+			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "x64-windows-unreal", "include"));
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
