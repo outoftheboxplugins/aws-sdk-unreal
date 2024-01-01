@@ -7,7 +7,7 @@
 #include "ExampleAwsEc2Subsystem.generated.h"
 
 /**
- * Example implementation of the EC2 module of the aws-cpp-sdk exposed to blueprints
+ * Example implementation of the EC2 module of the aws-sdk-cpp exposed to blueprints
  */
 UCLASS()
 class AWSSDKINTEGRATION_API UExampleAwsEc2Subsystem : public UGameInstanceSubsystem

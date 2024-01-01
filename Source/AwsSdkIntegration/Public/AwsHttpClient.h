@@ -7,7 +7,7 @@ THIRD_PARTY_INCLUDES_START
 THIRD_PARTY_INCLUDES_END
 
 /**
- * Allows the aws-cpp-sdk to use Unreal's HTTP module to make API requests.
+ * Allows the aws-sdk-cpp to use Unreal's HTTP module to make API requests.
  * This is important on platforms like Android where standard curl requests have SSL issues or MacOS where native requests are used instead of curl
  */
 class FUnrealHttpClient : public Aws::Http::HttpClientFactory

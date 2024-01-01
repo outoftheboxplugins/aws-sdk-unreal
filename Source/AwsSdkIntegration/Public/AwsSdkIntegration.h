@@ -5,7 +5,7 @@
 #include "Modules/ModuleManager.h"
 
 /**
- * Module responsible for exposing the aws-cpp-sdk from AwsSdkLibrary into Unreal
+ * Module responsible for exposing the aws-sdk-cpp from AwsSdkLibrary into Unreal
  */
 class FAwsIntegrationModule : public IModuleInterface
 {

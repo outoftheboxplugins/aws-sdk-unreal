@@ -11,7 +11,7 @@ THIRD_PARTY_INCLUDES_END
 #include "AwsIntegrationSubsystem.generated.h"
 
 /**
- * Handles aws-cpp-sdk initialization and shutdown
+ * Handles aws-sdk-cpp initialization and shutdown
  */
 UCLASS()
 class AWSSDKINTEGRATION_API UAwsIntegrationSubsystem : public UGameInstanceSubsystem

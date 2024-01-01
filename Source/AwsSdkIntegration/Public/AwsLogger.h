@@ -7,7 +7,7 @@ THIRD_PARTY_INCLUDES_START
 THIRD_PARTY_INCLUDES_END
 
 /**
- * Forwards the output logs from the aws-cpp-sdk into Unreal Engine based on their verbosity
+ * Forwards the output logs from the aws-sdk-cpp into Unreal Engine based on their verbosity
  */
 class FUnrealLogger final : public Aws::Utils::Logging::LogSystemInterface
 {
