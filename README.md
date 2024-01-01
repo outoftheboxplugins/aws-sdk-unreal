@@ -35,7 +35,17 @@ go over the example thingy
 
 ## Why is the cusotm allocator used
 
+# Common issues
+
 ## Third party includes
+
+```
+0>event_loop.h(29,5): Error  : 'AWS_USE_IO_COMPLETION_PORTS' is not defined, evaluates to 0 [-Werror,-Wundef]
+```
+
+C++ handles undefined macros by replacing them with `0`, however Unreal errors out when it faces an undefined macro.
+
+Solution: To avoid this wrap the `#include` directives betweeen `THIRD_PARTY_INCLUDES_START` and `THIRD_PARTY_INCLUDES_END` like:
 
 ```
 THIRD_PARTY_INCLUDES_START
