@@ -23,18 +23,21 @@ else {
     git clone https://github.com/Microsoft/vcpkg.git "$vcpkgDir"
 }
 
-$vcpkgExecutable = ""
 $vcpkgBootstrap = ""
+$vcpkgExecutable = ""
 
 if ($IsLinux) {
+    Write-Host "Building for Linux"
     $vcpkgBootstrap = "$vcpkgDir/bootstrap-vcpkg.sh"
     $vcpkgExecutable = "$vcpkgDir/vcpkg"
 }
 elseif ($IsMacOS) {
+    Write-Host "Building for MacOS"
     $vcpkgBootstrap = "$vcpkgDir/bootstrap-vcpkg.sh"
     $vcpkgExecutable = "$vcpkgDir/vcpkg"
 }
-elseif ($IsWindows) {
+else {
+    Write-Host "Building for Windows"
     $vcpkgBootstrap = "$vcpkgDir/bootstrap-vcpkg.bat"
     $vcpkgExecutable = "$vcpkgDir/vcpkg.exe"
 }
