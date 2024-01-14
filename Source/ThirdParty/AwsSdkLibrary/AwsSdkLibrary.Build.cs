@@ -8,7 +8,7 @@ using UnrealBuildTool;
 
 public class AwsSdkLibrary : ModuleRules
 {
-	// string[] AwsLibraries = {"core", "s3", "dynamodb"};
+	//string[] AwsLibraries = {"core", "s3", "dynamodb"};
 	private readonly string[] AwsLibraries = { "core", "ec2" };
 
 	public AwsSdkLibrary(ReadOnlyTargetRules Target) : base(Target)
@@ -43,7 +43,13 @@ public class AwsSdkLibrary : ModuleRules
 
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "arm64-ios-unreal", "include"));
 		}
+		else if (Target.Platform == UnrealTargetPlatform.Linux)
+		{
+			BuildAwsLibraries("x64-linux-unreal", "pwsh");
+			AddPrecompiledLibraries(Path.Combine(ModuleDirectory, "x64-linux-unreal", "lib"), "*.a");
 
+			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "x64-linux-unreal", "include"));
+		}
 
 		// We will be using Unreal Engine allocators, so we need this define to make sure we are using the correct types
 		PublicDefinitions.Add("USE_AWS_MEMORY_MANAGEMENT");
